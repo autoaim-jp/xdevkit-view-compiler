@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  view_container:
+    container_name: view-container
+    build:
+      context: ../
+      dockerfile: ./docker/viewContainer/Dockerfile
+    tty: true
+    volumes:
+      - ../view:/app/view
+      - ../src:/app/src
+    command: sh -c "yarn run ${BUILD_COMMAND}"
+
+

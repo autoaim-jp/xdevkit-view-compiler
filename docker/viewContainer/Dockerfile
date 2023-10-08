@@ -1,0 +1,17 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+RUN apt update \
+&& apt install -y --no-install-recommends uglifyjs
+
+RUN yarn global add esbuild tailwindcss clean-css html-minifier js-beautify
+
+COPY ./src/package.json /app/
+
+RUN yarn install
+
+COPY ./src /app/
+
+
+
