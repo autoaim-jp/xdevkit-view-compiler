@@ -5,9 +5,9 @@
   "repository": "git@github.com:/autoaim-jp/xdevkit-view-compiler.git",
   "author": "autoaim_jp <git@autoaim.jp>",
   "scripts": {
-		"compile": "node ./src/app.js --js ./view/src/js/ --css ./view/src/css/ --ejs ./view/src/ejs/page/ --ejs-component ./view/src/ejs/component/ --out ./view/build/ --ejs-config ../view/src/config/ejs.config.js --tailwindcss-config ./view/src/config/tailwind.config.cjs --tailwindcss-file ./view/src/css/tailwind.css --js-ignore _lib,_setting --command compile",
-		"compile-minify": "node ./src/app.js --js ./view/src/js/ --css ./view/src/css/ --ejs ./view/src/ejs/page/ --ejs-component ./view/src/ejs/component/ --out ./view/build/ --ejs-config ../view/src/config/ejs.config.js --tailwindcss-config ./view/src/config/tailwind.config.cjs --tailwindcss-file ./view/src/css/tailwind.css --js-ignore _lib,_setting --command compile --minify",
-		"watch": "node ./src/app.js --js ./view/src/js/ --css ./view/src/css/ --ejs ./view/src/ejs/page/ --ejs-component ./view/src/ejs/component/ --out ./view/build/ --ejs-config ../view/src/config/ejs.config.js --tailwindcss-config ./view/src/config/tailwind.config.cjs --tailwindcss-file ./view/src/css/tailwind.css --js-ignore _lib,_setting --command watch"
+    "compile": "node ./src/app.js compile",
+    "compile-minify": "node ./src/app.js compile-minify",
+    "watch": "node ./src/app.js watch"
   },
   "type": "module",
   "dependencies": {

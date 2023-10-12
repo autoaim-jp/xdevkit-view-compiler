@@ -4,7 +4,6 @@
  */
 import fs from 'fs'
 import path from 'path'
-import { program } from 'commander'
 import { spawn } from 'child_process'
 import uglifyjs from 'uglify-js'
 import ejs from 'ejs'
@@ -12,6 +11,8 @@ import Cleancss from 'clean-css'
 import htmlMinifier from 'html-minifier'
 import jsbeautify from 'js-beautify'
 import { fileURLToPath } from 'url'
+
+import setting from './setting.js'
 
 const cacheForWatch = {}
 
@@ -380,51 +381,33 @@ const startWatcher = (watchPath, action) => {
   })
 }
 
+const argParse = () => {
+  const arg = process.argv[2]
+  const isWatch = arg.indexOf('watch') >= 0
+  const isMinifyMode = arg.indexOf('minify') >= 0
+
+  return { isWatch, isMinifyMode }
+}
+
 /* main */
 const main = async () => {
-  program
-    .option('--command <command>', '"compile", "watch"', 'compile')
-    .option('--js <path>', 'browser js source folder path', './view/src/js/')
-    .option('--css <path>', 'browser css source folder path', './view/src/css/')
-    .option('--ejs <path>', 'browser ejs source folder path', './view/src/ejs/page/')
-    .option('--ejs-component <path>', 'browser ejs source folder path', './view/src/ejs/component/')
-    .option('--out <path>', 'browser js destitaion folder path', './view/build/')
-    .option('--tailwindcss-config <path>', 'tailwind.config.js file path', './view/src/config/tailwind.config.cjs')
-    .option('--tailwindcss-file <path>', 'tailwind.css file path', './view/src/css/tailwind.css')
-    .option('--ejs-config <path>', 'ejs.config.js file path', '../../../view/src/config/ejs.config.js')
-    .option('--minify', 'minify or not', false)
-    .option('--js-ignore <folderName>,<folderName>', 'ignore folder in browser js source folder', '_setting,_lib')
-  program.parse()
-
-  const argList = program.opts()
-  console.log(argList)
-
-  const jsSourceDirPath = argList.js
-  const cssSourceDirPath = argList.css
-  const ejsSourceDirPath = argList.ejs
-  const ejsComponentSourceDirPath = argList.ejsComponent
-  const buildDirPath = argList.out
-  const tailwindcssConfigPath = argList.tailwindcssConfig
-  const tailwindcssFilePath = argList.tailwindcssFile
-  const isMinifyMode = argList.minify
-  const { command } = argList
-  const jsIgnoreDirPath = argList.jsIgnore.split(',').filter((row) => { return row !== '' })
-  const configFilePath = argList.ejsConfig
+  const { isWatch, isMinifyMode } = argParse()
+  const jsSourceDirPath = setting.SRC_JS_PATH
+  const cssSourceDirPath = setting.SRC_CSS_PATH
+  const ejsSourceDirPath = setting.SRC_EJS_PAGE_PATH
+  const ejsComponentSourceDirPath = setting.SRC_EJS_COMPONENT_PATH
+  const buildDirPath = setting.DEST_BUILD_PATH
+  const configFilePath = setting.CONFIG_EJS_FILE_PATH
+  const tailwindcssConfigPath = setting.CONFIG_TAILWINDCSS_FILE_PATH
+  const tailwindcssFilePath = setting.SRC_TAILWINDCSS_FILE_PATH
+  const jsIgnoreDirPath = setting.JS_IGNORE.split(',').filter((row) => { return row !== '' })
 
   const jsBuildDirPath = `${buildDirPath}js/`
   const cssBuildDirPath = `${buildDirPath}css/`
   const ejsBuildDirPath = buildDirPath
   const { ejsConfig } = await import(configFilePath)
 
-  if (command === 'compile') {
-    removeBuildDir(jsBuildDirPath, cssBuildDirPath, ejsBuildDirPath)
-    await compileAllJs(jsSourceDirPath, jsIgnoreDirPath, compilePageJsHandler(jsBuildDirPath, isMinifyMode))
-    await buildAllEjs(ejsSourceDirPath, watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath))
-    await buildAllCss(cssSourceDirPath, compilePageCssHandler(cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
-    await buildAllEjs(ejsSourceDirPath, compilePageEjsHandler(ejsConfig, ejsBuildDirPath, isMinifyMode))
-  }
-
-  if (command === 'watch') {
+  if (isWatch) {
     await watchAllJs(jsSourceDirPath, jsIgnoreDirPath, watchPageJsHandler(/\.js$/, jsSourceDirPath, jsBuildDirPath))
     await buildAllCss(cssSourceDirPath, watchPageCssHandler(/\.css$/, cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
     await buildAllEjs(ejsSourceDirPath, watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath))
@@ -435,6 +418,12 @@ const main = async () => {
     startWatcher(ejsSourceDirPath, watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath))
     startWatcher(ejsComponentSourceDirPath, watchComponentEjsHandler(ejsSourceDirPath, ejsConfig, ejsBuildDirPath))
     startWatcher(`${__dirname}/${configFilePath}`, watchEjsConfigHandler())
+  } else {
+    removeBuildDir(jsBuildDirPath, cssBuildDirPath, ejsBuildDirPath)
+    await compileAllJs(jsSourceDirPath, jsIgnoreDirPath, compilePageJsHandler(jsBuildDirPath, isMinifyMode))
+    await buildAllEjs(ejsSourceDirPath, watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath))
+    await buildAllCss(cssSourceDirPath, compilePageCssHandler(cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
+    await buildAllEjs(ejsSourceDirPath, compilePageEjsHandler(ejsConfig, ejsBuildDirPath, isMinifyMode))
   }
 }
 
