@@ -405,7 +405,8 @@ const main = async () => {
   const jsBuildDirPath = `${buildDirPath}js/`
   const cssBuildDirPath = `${buildDirPath}css/`
   const ejsBuildDirPath = buildDirPath
-  const { ejsConfig } = await import(configFilePath)
+  const ejsConfigExport = await import(configFilePath)
+  const { ejsConfig } = ejsConfigExport.default
 
   if (isWatch) {
     await watchAllJs(jsSourceDirPath, jsIgnoreDirPath, watchPageJsHandler(/\.js$/, jsSourceDirPath, jsBuildDirPath))
