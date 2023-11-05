@@ -416,8 +416,18 @@ const main = async () => {
     const __dirname = path.dirname(fileURLToPath(import.meta.url))
     startWatcher(jsSourceDirPath, watchPageJsHandler(/\.js$/, jsSourceDirPath, jsBuildDirPath))
     startWatcher(cssSourceDirPath, watchPageCssHandler(/\.css$/, cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
-    startWatcher(ejsSourceDirPath, watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath))
-    startWatcher(ejsComponentSourceDirPath, watchComponentEjsHandler(ejsSourceDirPath, ejsConfig, ejsBuildDirPath))
+
+    const watchPageAction = async (filePath, dirPath) => {
+      watchPageEjsHandler(/\.ejs$/, ejsConfig, ejsBuildDirPath)(filePath, dirPath)
+      await buildAllCss(cssSourceDirPath, compilePageCssHandler(cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
+    }
+    startWatcher(ejsSourceDirPath, watchPageAction)
+    const watchComponentAction = async (filePath, dirPath) => {
+      watchComponentEjsHandler(ejsSourceDirPath, ejsConfig, ejsBuildDirPath)(filePath, dirPath)
+      await buildAllCss(cssSourceDirPath, compilePageCssHandler(cssBuildDirPath, tailwindcssConfigPath, tailwindcssFilePath))
+    }
+    startWatcher(ejsComponentSourceDirPath, watchComponentAction)
+
     startWatcher(`${__dirname}/${configFilePath}`, watchEjsConfigHandler())
   } else {
     removeBuildDir(jsBuildDirPath, cssBuildDirPath, ejsBuildDirPath)
