@@ -12,7 +12,7 @@ const getBreadcrumbList = (pathList) => {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export const ejsConfig = {
+const ejsConfig = {
   _common: {
     componentPath: __dirname + '/../ejs/component/',
     xdevkitComponentPath: __dirname + '/../ejs/_xdevkit/component/',
@@ -41,5 +41,9 @@ export const ejsConfig = {
     inlineScriptList: ['/js/login/app.js'],
     externalScriptList: [],
   },
+}
+
+export default {
+  ejsConfig,
 }
 
