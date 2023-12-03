@@ -3,6 +3,8 @@ PHONY=default help view-rebuild view-compile view-compile-minify view-watch
 
 .PHONY: $(PHONY)
 
+VIEW_PATH?=../view
+
 default: help
 
 view-rebuild: docker-compose-up-view-rebuild
@@ -20,10 +22,10 @@ docker-compose-up-view-rebuild:
 	docker compose -p docker-view -f ./docker/docker-compose.view.yml down --volumes
 	docker compose -p docker-view -f ./docker/docker-compose.view.yml build
 docker-compose-up-view-compile:
-	BUILD_COMMAND="compile" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
+	VIEW_PATH=${VIEW_PATH} BUILD_COMMAND="compile" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
 docker-compose-up-view-compile-minify:
-	BUILD_COMMAND="compile-minify" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
+	VIEW_PATH=${VIEW_PATH} BUILD_COMMAND="compile-minify" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
 docker-compose-up-view-watch:
-	BUILD_COMMAND="watch" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
+	VIEW_PATH=${VIEW_PATH} BUILD_COMMAND="watch" docker compose -p docker-view -f ./docker/docker-compose.view.yml up --abort-on-container-exit
 
 
