@@ -202,7 +202,7 @@ const compilePageEjsHandler = (ejsConfig, ejsBuildDirPath, isMinifyMode) => {
         removeTagWhitespace: true,
         useShortDoctype: true,
         minifyCSS: true,
-        minifyJS: false, // to prevent error
+        minifyJS: true,
       })
       fs.writeFileSync(buildHtmlPath, htmlMinified)
       /*
